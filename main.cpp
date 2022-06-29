@@ -110,14 +110,15 @@ int main()
 
 	// Vertice data
 	GLfloat vertices[] = {
-		0.5f, 0.5f, 0.0f, // Top Right
-		0.5f, -0.5f, 0.0f, // Bottom Right
-		-0.5f, -0.5f, 0.0f, // Bottom Left
-		-0.5f, 0.5f, 0.0f // Top Left
+		-1.0f, 0.0f, 0.0f,
+		-0.5f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		0.5f, 1.0f, 0.0f, // Top Left
+		1.0f, 0.0f, 0.0f
 	};
 	GLuint indices[] = { // Note that we start from 0!
-		0, 1, 3, // First Triangle
-		1, 2, 3 // Second Triangle
+		0, 1, 2, // First Triangle
+		2, 3, 4 // Second Triangle
 	};
 	// Vertex Buffer Objects to storage vertex data into GPU process
 	GLuint VBO;
@@ -154,7 +155,7 @@ int main()
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
 		// Draw wireframe mode
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
