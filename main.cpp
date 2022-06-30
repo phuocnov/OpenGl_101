@@ -90,8 +90,12 @@ int main()
 		// Draw here
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
 		// 5. Draw the triagle
 		shader.Use();
+		// Pass data to uniform
+		GLfloat offsetLocation = glGetUniformLocation(shader.Program, "offset");
+		glUniform1f(offsetLocation, -0.5f);
 		glBindVertexArray(VAO);
 		// Draw wireframe mode
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
