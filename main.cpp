@@ -7,6 +7,8 @@
 // GLFW
 #include <GLFW/glfw3.h>
 
+#include "shader.h"
+
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
 
@@ -50,94 +52,33 @@ int main()
 	glfwSetKeyCallback(window, key_callback);
 
 	// Shader program
-	// Source
-	const GLchar* vertexShaderSource = "#version 330 core\n"
-		"layout (location = 0) in vec3 position;\n"
-		"void main()\n"
-		"{\n"
-		"gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
-		"}\0";
-	const GLchar* fragmentShaderSource = "#version 330 core\n"
-		"out vec4 color;\n"
-		"void main()\n"
-		"{\n"
-		"color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-		"}\n\0";
 
-	GLuint vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-
-	GLuint fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-
-
-	// Check if shader compling is success or not
-	GLint success;
-	GLchar infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION FAILED!\n" << infoLog << std::endl;
-	}
-
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION FAILED!\n" << infoLog << std::endl;
-	}
-	// Create shader program that link 2 shader into 1 program and use when render it on screen
-	GLuint shaderProgram;
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	// Also check if linking program failed
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::PROGRAM::SHADER PROGRAM::LINKING FAILED!\n" << infoLog << std::endl;
-	}
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
+	Shader shader("vertexShader.glsl", "fragmentShader.glsl");
 	// Vertice data
 	GLfloat vertices[] = {
-		0.5f, 0.5f, 0.0f, // Top Right
-		0.5f, -0.5f, 0.0f, // Bottom Right
-		-0.5f, -0.5f, 0.0f, // Bottom Left
-		-0.5f, 0.5f, 0.0f // Top Left
-	};
-	GLuint indices[] = { // Note that we start from 0!
-		0, 1, 3, // First Triangle
-		1, 2, 3 // Second Triangle
+		// Positions         // Colors
+		 0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // Bottom Right
+		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // Bottom Left
+		 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // Top 
 	};
 	// Vertex Buffer Objects to storage vertex data into GPU process
 	GLuint VBO;
 	glGenBuffers(1, &VBO);
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
-	GLuint EBO;
-	glGenBuffers(1, &EBO);
 	// 1. Bind vertex array
 	glBindVertexArray(VAO);
 	// 2. Bind buffer 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
 	// 3. Then set our vertex attributes pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
+
+	// Color attrib
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 	// 4. Unbind the VAO
 	glBindVertexArray(0);
 
@@ -146,16 +87,15 @@ int main()
 	{
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
-
 		// Draw here
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		// 5. Draw the triagle
-		glUseProgram(shaderProgram);
+		shader.Use();
 		glBindVertexArray(VAO);
 		// Draw wireframe mode
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindVertexArray(0);
 
 		// Swap the screen buffers
