@@ -18,15 +18,15 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="shader.h">
+    <ClCompile Include="shader\shader.h">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="vertexShader.glsl">
+    <None Include="shader\vertexShader.glsl">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="fragmentShader.glsl">
+    <None Include="shader\fragmentShader.glsl">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
