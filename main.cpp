@@ -6,8 +6,12 @@
 
 // GLFW
 #include <GLFW/glfw3.h>
-
 #include <SOIL/SOIL.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "shader/shader.h"
 
 // Window dimensions
@@ -136,6 +140,12 @@ int main()
 	SOIL_free_image_data(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	// Testing math Stuff
+	glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+	glm::mat4 trans;
+	trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+	vec = trans * vec;
+	std::cout << vec.x << vec.y << vec.z << std::endl;
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
