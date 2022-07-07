@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 
 #include <SOIL/SOIL.h>
+#include <glm.hpp>
 #include "shader/shader.h"
 
 // Window dimensions
@@ -15,6 +16,8 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action,
 	int mode);
+
+GLfloat mixValue = 0.3f;
 
 // The MAIN function, from here we start the application and run the game loop
 int main()
@@ -154,6 +157,9 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		glUniform1i(glGetUniformLocation(shader.Program, "ourTexture2"), 1);
 
+		// Set current value to uniform mix
+		glUniform1f(glGetUniformLocation(shader.Program, "mixValue"), mixValue);
+
 		glBindVertexArray(VAO);
 		// Draw wireframe mode
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -176,4 +182,20 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action,
 		// closing the application
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+
+	// Change uniform value when press up and down key
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+	{
+		std::cout << "UP: " << mixValue << std::endl;
+		mixValue += 0.1f;
+		if (mixValue > 1.0f)
+			mixValue = 1.0f;
+	}
+	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+	{
+		std::cout << "DOWN: " << mixValue << std::endl;
+		mixValue -= 0.1f;
+		if (mixValue < 0.0f)
+			mixValue = 0.0f;
+	}
 }

@@ -116,7 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\%40RESEARCH\OpenGl Project\lib\soil\include;D:\%40RESEARCH\OpenGl Project\lib\glew-2.2.0-win32\glew-2.2.0\include;D:\%40RESEARCH\OpenGl Project\lib\glad\include;D:\%40RESEARCH\OpenGl Project\lib\glfw-3.3.7.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\%40RESEARCH\OpenGl Project\lib\glm;D:\%40RESEARCH\OpenGl Project\lib\soil\include;D:\%40RESEARCH\OpenGl Project\lib\glew-2.2.0-win32\glew-2.2.0\include;D:\%40RESEARCH\OpenGl Project\lib\glad\include;D:\%40RESEARCH\OpenGl Project\lib\glfw-3.3.7.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,7 +134,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\%40RESEARCH\OpenGl Project\lib\soil\include;D:\%40RESEARCH\OpenGl Project\lib\glew-2.2.0-win32\glew-2.2.0\include;D:\%40RESEARCH\OpenGl Project\lib\glad\include;D:\%40RESEARCH\OpenGl Project\lib\glfw-3.3.7.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\%40RESEARCH\OpenGl Project\lib\glm;D:\%40RESEARCH\OpenGl Project\lib\soil\include;D:\%40RESEARCH\OpenGl Project\lib\glew-2.2.0-win32\glew-2.2.0\include;D:\%40RESEARCH\OpenGl Project\lib\glad\include;D:\%40RESEARCH\OpenGl Project\lib\glfw-3.3.7.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
