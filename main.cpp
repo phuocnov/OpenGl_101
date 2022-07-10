@@ -8,9 +8,10 @@
 #include <GLFW/glfw3.h>
 #include <SOIL/SOIL.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtx/string_cast.hpp"
 
 #include "shader/shader.h"
 
@@ -140,12 +141,7 @@ int main()
 	SOIL_free_image_data(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	// Testing math Stuff
-	glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-	glm::mat4 trans;
-	trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-	vec = trans * vec;
-	std::cout << vec.x << vec.y << vec.z << std::endl;
+	
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
@@ -157,12 +153,22 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		// 5. Draw the triagle
 
-		shader.Use();
 		glBindTexture(GL_TEXTURE_2D, texture1);
 		glUniform1i(glGetUniformLocation(shader.Program, "ourTexture1"), 0);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		glUniform1i(glGetUniformLocation(shader.Program, "ourTexture2"), 1);
+
+		shader.Use();
+
+		// Create transformations
+		glm::mat4 transform;
+		transform = glm::translate(glm::mat4(1), glm::vec3(0.5f, -0.5f, 0.0f));
+		transform = glm::rotate(glm::mat4(1), 50.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+
+		GLuint transformLoc = glGetUniformLocation(shader.Program, "transform");
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+
 
 		glBindVertexArray(VAO);
 		// Draw wireframe mode
