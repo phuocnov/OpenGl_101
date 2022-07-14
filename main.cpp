@@ -140,7 +140,8 @@ int main()
 	glGenerateMipmap(GL_TEXTURE_2D);
 	SOIL_free_image_data(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
-
+	
+	// View setting up
 	
 
 	// Game loop
@@ -161,13 +162,27 @@ int main()
 
 		shader.Use();
 
-		// Create transformations
-		glm::mat4 transform;
-		transform = glm::translate(glm::mat4(1), glm::vec3(0.5f, -0.5f, 0.0f));
-		transform = glm::rotate(glm::mat4(1), 50.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 
-		GLuint transformLoc = glGetUniformLocation(shader.Program, "transform");
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+		// Create view projection
+		glm::mat4 model, view, projection;
+		model = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.f));
+		projection = glm::perspective(glm::radians(45.f), float(WIDTH) / float(HEIGHT), 0.1f, 100.f);
+		
+
+		//std::cout << "projection matrix: " << glm::to_string(projection) << std::endl;
+
+		GLuint modelLoc = glGetUniformLocation(shader.Program, "model");
+		GLuint viewLoc = glGetUniformLocation(shader.Program, "view");
+		GLuint projectionLoc = glGetUniformLocation(shader.Program, "projection");
+
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+
+		//GLuint transformLoc = glGetUniformLocation(shader.Program, "transform");
+		//glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
 
 		glBindVertexArray(VAO);
