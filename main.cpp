@@ -18,8 +18,30 @@
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
 
+// Camera
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 camreraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 cameraDirection = glm::normalize(cameraPos - camreraTarget);
+
+// Camera vector
+glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+
+// Camera movement
+bool keys[1024];
+
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
+GLfloat currentFrame = 0.0f;
+
+
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action,
 	int mode);
+void doMovement();
+void recaculateDeltatime();
 
 // The MAIN function, from here we start the application and run the game loop
 int main()
@@ -141,7 +163,7 @@ int main()
 	SOIL_free_image_data(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	
-	// View setting up
+
 	
 
 	// Game loop
@@ -149,6 +171,7 @@ int main()
 	{
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
+		recaculateDeltatime();
 		// Draw here
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -162,15 +185,14 @@ int main()
 
 		shader.Use();
 
+		// Update camera position
+
+		glm::mat4 cameraView = glm::lookAt(cameraPos, cameraPos + cameraFront, up);
 
 		// Create view projection
 		glm::mat4 model, view, projection;
-		model = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.f));
+		view = cameraView;
 		projection = glm::perspective(glm::radians(45.f), float(WIDTH) / float(HEIGHT), 0.1f, 100.f);
-		
-
-		//std::cout << "projection matrix: " << glm::to_string(projection) << std::endl;
 
 		GLuint modelLoc = glGetUniformLocation(shader.Program, "model");
 		GLuint viewLoc = glGetUniformLocation(shader.Program, "view");
@@ -200,6 +222,26 @@ int main()
 	return 0;
 }
 
+void doMovement()
+{
+	// Movement handler
+	GLfloat movementSpeed = 50.0f * deltaTime;
+	if (keys[GLFW_KEY_W])
+		cameraPos += movementSpeed * cameraFront;
+	if (keys[GLFW_KEY_S])
+		cameraPos -= movementSpeed * cameraFront;
+	if (keys[GLFW_KEY_D])
+		cameraPos += movementSpeed * cameraRight;
+	if (keys[GLFW_KEY_A])
+		cameraPos -= movementSpeed * cameraRight;
+}
+
+void recaculateDeltatime() {
+	currentFrame = glfwGetTime();
+	deltaTime = currentFrame - lastFrame;
+	lastFrame = currentFrame;
+}
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action,
 	int mode)
 {
@@ -207,4 +249,15 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action,
 		// closing the application
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+
+	// Add key pressed into queue
+	if (key >= 0 && key <= 1024)
+	{
+	if (action == GLFW_PRESS)
+		keys[key] = true;
+	if (action == GLFW_RELEASE)
+		keys[key] = false;
+	}
+
+	doMovement();
 }
