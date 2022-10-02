@@ -14,32 +14,41 @@
 #include "glm/gtx/string_cast.hpp"
 
 #include "shader/shader.h"
+#include "camera/camera.h"
 
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
 
+// Function prototype
+void key_callback(GLFWwindow* window, int key, int scancode, int action,
+	int mode);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
 // Camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 camreraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 cameraDirection = glm::normalize(cameraPos - camreraTarget);
-
-// Camera vector
-glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-
-// Camera movement
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 bool keys[1024];
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 GLfloat currentFrame = 0.0f;
 
+// Mouse camera controller
+/*
+	1. Calculate the mouse’s offset since the last frame.
+	2. Add the offset values to the camera’s yaw and pitch values.
+	3. Add some constraints to the maximum / minimum yaw / pitch values
+	4. Calculate the direction vector
+*/
+GLfloat lastX = WIDTH/2, lastY = HEIGHT/2;
+GLfloat yaw = -90.0f;
+GLfloat pitch = 0.0f;
+
+// Camera zoom
+GLfloat fov = 45.0f;
 
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action,
-	int mode);
+
 void doMovement();
 void recaculateDeltatime();
 
@@ -78,6 +87,11 @@ int main()
 	glfwGetFramebufferSize(window, &width, &height);
 	glViewport(0, 0, width, height);
 	glfwSetKeyCallback(window, key_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+
+	// Set mouse won't be visible and should not leave the window like FPS game
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// Shader program
 
@@ -172,6 +186,7 @@ int main()
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 		recaculateDeltatime();
+		doMovement();
 		// Draw here
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -187,12 +202,12 @@ int main()
 
 		// Update camera position
 
-		glm::mat4 cameraView = glm::lookAt(cameraPos, cameraPos + cameraFront, up);
+		glm::mat4 cameraView = camera.GetViewMatrix();
 
 		// Create view projection
 		glm::mat4 model, view, projection;
 		view = cameraView;
-		projection = glm::perspective(glm::radians(45.f), float(WIDTH) / float(HEIGHT), 0.1f, 100.f);
+		projection = glm::perspective(glm::radians(fov), float(WIDTH) / float(HEIGHT), 0.1f, 100.f);
 
 		GLuint modelLoc = glGetUniformLocation(shader.Program, "model");
 		GLuint viewLoc = glGetUniformLocation(shader.Program, "view");
@@ -225,15 +240,14 @@ int main()
 void doMovement()
 {
 	// Movement handler
-	GLfloat movementSpeed = 50.0f * deltaTime;
 	if (keys[GLFW_KEY_W])
-		cameraPos += movementSpeed * cameraFront;
+		camera.ProcessKeyboard(FORWARD, deltaTime);
 	if (keys[GLFW_KEY_S])
-		cameraPos -= movementSpeed * cameraFront;
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
 	if (keys[GLFW_KEY_D])
-		cameraPos += movementSpeed * cameraRight;
+		camera.ProcessKeyboard(RIGHT, deltaTime);
 	if (keys[GLFW_KEY_A])
-		cameraPos -= movementSpeed * cameraRight;
+		camera.ProcessKeyboard(LEFT, deltaTime);
 }
 
 void recaculateDeltatime() {
@@ -258,6 +272,26 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action,
 	if (action == GLFW_RELEASE)
 		keys[key] = false;
 	}
+}
+bool firstMouse = true;
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
 
-	doMovement();
+	GLfloat xoffset = xpos - lastX;
+	GLfloat yoffset = lastY - ypos; // Reversed since y-coordinates go from bottom to left
+	lastX = xpos;
+	lastY = ypos;
+
+	camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	camera.processScrollControl(yoffset);
 }
