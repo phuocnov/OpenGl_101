@@ -34,5 +34,8 @@
     <ClInclude Include="camera\camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="uitilities\vbo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
